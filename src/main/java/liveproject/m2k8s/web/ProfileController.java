@@ -47,12 +47,9 @@ public class ProfileController {
         profileService.update(profile);
     }
 
-    @PostMapping(value = "/{username}")
+    @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public void processRegistration(@PathVariable String username, @RequestBody @Valid Profile profile) {
-        if (!username.equals(profile.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username in URL and in payload don't match");
-        }
+    public void processRegistration(@RequestBody @Valid Profile profile) {
         profileService.save(profile);
     }
 

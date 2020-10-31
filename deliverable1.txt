@@ -1,0 +1,69 @@
+MYPC:~$ http POST localhost:8080/profile username=unamerkel password=changeme \
+>     firstName=Una lastName=Merkel email=unamerkel@example.com
+HTTP/1.1 201
+Connection: keep-alive
+Content-Length: 0
+Date: Sat, 31 Oct 2020 07:35:17 GMT
+Keep-Alive: timeout=60
+
+
+
+MYPC:~$ http localhost:8080/profile/unamerkel
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/json
+Date: Sat, 31 Oct 2020 07:35:32 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "email": "unamerkel@example.com",
+    "firstName": "Una",
+    "id": 1,
+    "lastName": "Merkel",
+    "password": "changeme",
+    "username": "unamerkel"
+}
+
+MYPC:~$ http localhost:8080/profile/russcolombo
+HTTP/1.1 404
+Connection: keep-alive
+Content-Type: application/json
+Date: Sat, 31 Oct 2020 07:35:39 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "error": "Not Found",
+    "message": "404 NOT_FOUND \"\"",
+    "path": "/profile/russcolombo",
+    "status": 404,
+    "timestamp": "2020-10-31T07:35:39.568+0000"
+}
+
+MYPC:~$ http PUT localhost:8080/profile/unamerkel id=6 username=unamerkel password=newpass \
+stName=>     firstName=Una lastName=Merkel email=unamerkel@example.com
+HTTP/1.1 200
+Connection: keep-alive
+Content-Length: 0
+Date: Sat, 31 Oct 2020 07:35:47 GMT
+Keep-Alive: timeout=60
+
+
+
+MYPC:~$ http localhost:8080/profile/unamerkel
+HTTP/1.1 200
+Connection: keep-alive
+Content-Type: application/json
+Date: Sat, 31 Oct 2020 07:35:58 GMT
+Keep-Alive: timeout=60
+Transfer-Encoding: chunked
+
+{
+    "email": "unamerkel@example.com",
+    "firstName": "Una",
+    "id": 1,
+    "lastName": "Merkel",
+    "password": "newpass",
+    "username": "unamerkel"
+}

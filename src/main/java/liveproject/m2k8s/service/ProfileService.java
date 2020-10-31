@@ -40,6 +40,8 @@ public class ProfileService {
         if (dbProfile == null) {
             throw new ProfileNotFoundException();
         }
+        dbProfile.setUsername(profile.getUsername());
+        dbProfile.setPassword(profile.getPassword());
         dbProfile.setEmail(profile.getEmail());
         dbProfile.setFirstName(profile.getFirstName());
         dbProfile.setLastName(profile.getLastName());
