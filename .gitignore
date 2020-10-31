@@ -1,2 +1,7 @@
 target/
 profile-mvc.iml
+.classpath
+.factorypath
+.project
+.settings/
+.vscode/

@@ -1,5 +1,8 @@
 package liveproject.m2k8s.service;
 
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,7 +25,8 @@ public class ProfileService {
         return profileRepository.findByUsername(username);
     }
 
-    public void save(Profile profile) {
+    @Transactional
+    public void save(@Valid Profile profile) {
         Profile dbProfile = profileRepository.findByUsername(profile.getUsername());
         if (dbProfile != null) {
             throw new ProfileAlreadyExistingException();
@@ -30,29 +34,14 @@ public class ProfileService {
         profileRepository.save(profile);
     }
 
-    public void update(Profile profile) {
+    @Transactional
+    public void update(@Valid Profile profile) {
         Profile dbProfile = profileRepository.findByUsername(profile.getUsername());
         if (dbProfile == null) {
             throw new ProfileNotFoundException();
         }
-        boolean dirty = false;
-        if (!StringUtils.isEmpty(profile.getEmail())
-                && !profile.getEmail().equals(dbProfile.getEmail())) {
-            dbProfile.setEmail(profile.getEmail());
-            dirty = true;
-        }
-        if (!StringUtils.isEmpty(profile.getFirstName())
-                && !profile.getFirstName().equals(dbProfile.getFirstName())) {
-            dbProfile.setFirstName(profile.getFirstName());
-            dirty = true;
-        }
-        if (!StringUtils.isEmpty(profile.getLastName())
-                && !profile.getLastName().equals(dbProfile.getLastName())) {
-            dbProfile.setLastName(profile.getLastName());
-            dirty = true;
-        }
-        if (dirty) {
-            profileRepository.save(profile);
-        }
+        dbProfile.setEmail(profile.getEmail());
+        dbProfile.setFirstName(profile.getFirstName());
+        dbProfile.setLastName(profile.getLastName());
     }
 }

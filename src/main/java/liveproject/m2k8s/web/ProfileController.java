@@ -3,8 +3,6 @@ package liveproject.m2k8s.web;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +39,6 @@ public class ProfileController {
 
     @PutMapping(value = "/{username}")
     @ResponseStatus(code = HttpStatus.OK)
-    @Transactional
     public void updateProfile(@PathVariable String username, @RequestBody @Valid Profile profile) {
         if (!username.equals(profile.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot change username for Profile");
@@ -52,7 +49,6 @@ public class ProfileController {
 
     @PostMapping(value = "/{username}")
     @ResponseStatus(code = HttpStatus.CREATED)
-    @Transactional
     public void processRegistration(@PathVariable String username, @RequestBody @Valid Profile profile) {
         if (!username.equals(profile.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username in URL and in payload don't match");
