@@ -1,0 +1,30 @@
+================== COMPOSE FILE =================
+version: "3.8"
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "database"
+  database:
+    image: "mysql"
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+       - db-data:/var/lib/mysql
+  
+volumes:
+  db-data:
+    external: true
+    name: mysql-db-data
+
+================== DOCKERFILE ===================
+FROM openjdk:8-jdk-alpine
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
