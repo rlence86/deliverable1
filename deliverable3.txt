@@ -1,0 +1,144 @@
+----------kustomization.yml----------------------
+resources:
+    - mysql-deployment.yaml
+    - spring-deployment.yaml
+
+
+----------mysql-deployment.yaml------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: profiles-mysql
+  labels:
+    app: profiles
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: profiles
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: profiles
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: profiles-mysql
+  labels:
+    app: profiles
+spec:
+  selector:
+    matchLabels:
+      app: profiles
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: profiles
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: root
+        - name: MYSQL_DATABASE
+          value: profiles
+        - name: MYSQL_USER
+          value: empuser
+        - name: MYSQL_PASSWORD
+          value: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+
+          
+----------spring-deployment.yaml------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: profiles
+  labels:
+    app: profiles
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: profiles
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: profiles-pv-claim
+  labels:
+    app: profiles
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: profiles
+  labels:
+    app: profiles
+spec:
+  selector:
+    matchLabels:
+      app: profiles
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: profiles
+        tier: frontend
+    spec:
+      containers:
+      - image: rlence86/legacy-to-cloud
+        name: profiles
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://profiles-mysql:3306/profiles?useLegacyDatetimeCode=false&serverTimezone=UTC
+        - name: SPRING_DATASOURCE_USERNAME
+          value: empuser
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: password
+        ports:
+        - containerPort: 8080
+          name: profiles
+        volumeMounts:
+        - name: profiles-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: profiles-persistent-storage
+        persistentVolumeClaim:
+          claimName: profiles-pv-claim
